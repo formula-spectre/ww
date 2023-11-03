@@ -1,0 +1,23 @@
+UUID=fef33587-1dfe-4f56-9a7f-9071d16a316a / ext4 defaults,noatime,commit=600,errors=remount-ro 0 1
+tmpfs /tmp tmpfs defaults,nosuid 0 0
+
+
+
+
+# /dev/sda1
+UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/srv/jellyfin	btrfs     	rw,relatime,space_cache=v2,subvolid=258,subvol=/jellyfin-data	0 0
+
+# /dev/sda1
+UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/vw-data  	btrfs     	rw,relatime,space_cache=v2,subvolid=256,subvol=/vw-data	0 0
+
+# /dev/sda1
+UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/torrents 	btrfs     	rw,relatime,space_cache=v2,subvolid=259,subvol=/torrents	0 0
+
+# /dev/sda1
+UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/media    	btrfs     	rw,relatime,space_cache=v2,subvolid=257,subvol=/media	0 0
+
+# /dev/sda1
+#UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/mnt      	btrfs     	rw,relatime,space_cache=v2,subvolid=5,subvol=/	0 0
+
+# /dev/sda1
+UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/srv/qbittorrent	btrfs     	rw,relatime,space_cache=v2,subvolid=260,subvol=/qbittorrent-data	0 0
