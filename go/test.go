@@ -44,20 +44,15 @@ func mountNecessaryFileSystems() {
 		MS_NOSUID,
 		"subvolid=260,subvol=/qbittorrent-data")
 }
-func podman(args ...string) error {
-	podman := exec.Command("/usr/bin/podman", args...)
-	podman.Env = expandPath(os.Environ())
-	podman.Env = append(podman.Env, "TMPDIR=/tmp")
-	podman.Stdin = os.Stdin
-	podman.Stdout = os.Stdout
-	podman.Stderr = os.Stderr
-	if err := podman.Run(); err != nil {
-		return fmt.Errorf("%v: %v", podman.Args, err)
-	}
-	return nil
-}
 */
-const dockerComposeFile string = `
+
+import (
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+)
+const dockerComposeFile = `
 version: "3.5"
 services:
   qbittorrent:
@@ -125,7 +120,47 @@ UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/media    	btrfs     	rw,relatime,spac
 UUID=3dcaa245-20c7-43b1-ada9-9e65a8f290b8	/srv/qbittorrent	btrfs     	rw,relatime,space_cache=v2,subvolid=260,subvol=/qbittorrent-data	0 0
 
 `
+func expandPath(env []string) []string {
+	extra := "/user:/usr/local/bin"
+	found := false
+	for idx, val := range env {
+		parts := strings.Split(val, "=")
+		if len(parts) < 2 {
+			continue // malformed entry
+		}
+		key := parts[0]
+		if key != "PATH" {
+			continue
+		}
+		val := strings.Join(parts[1:], "=")
+		env[idx] = fmt.Sprintf("%s=%s:%s", key, extra, val)
+		found = true
+	}
+	if !found {
+		const busyboxDefaultPATH = "/usr/local/sbin:/sbin:/usr/sbin:/usr/local/bin:/bin:/usr/bin"
+		env = append(env, fmt.Sprintf("PATH=%s:%s", extra, busyboxDefaultPATH))
+	}
+	return env
+}
+
+func dockerCompose(args ...string) error {
+	dockercompose := exec.Command("/usr/bin/docker", args...)
+	dockercompose.Env = expandPath(os.Environ())
+	dockercompose.Env = append(dockercompose.Env, "TMPDIR=/tmp")
+	dockercompose.Stdin = os.Stdin
+	dockercompose.Stdout = os.Stdout
+	dockercompose.Stderr = os.Stderr
+	if err := dockercompose.Run(); err != nil {
+		return fmt.Errorf("%v: %v", dockercompose.Args, err)
+	}
+	return nil
+}
 
 func main() {
-	fmt.Println(dockerComposeFile)
+	if err := os.WriteFile("/tmp/docker-compose.yaml", []byte(dockerComposeFile), 0644); err != nil {
+		log.Print(err)
+	}
+	if err := dockerCompose("compose", "-f", "/tmp/docker-compose.yaml", "-d"); err != nil {
+		log.Fatal(err)
+	}
 }
