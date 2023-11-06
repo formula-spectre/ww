@@ -10,4 +10,5 @@ git add *
 git commit -m "autosync from vector-sigma @ $(date +%c)"
 git push
 cd ~/
+ssh-add -D ~/.ssh/id_ed25519-gh
 killall ssh-agent
