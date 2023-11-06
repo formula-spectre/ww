@@ -7,7 +7,7 @@ ssh-add ~/.ssh/id_ed25519-gh
 
 cd ~/ww
 git add *
-git commit -m 'autosync from vector-sigma @ ${date +%c}'
+git commit -m "autosync from vector-sigma @ $(date +%c)"
 git push
 cd ~/
 killall ssh-agent
