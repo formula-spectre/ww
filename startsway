@@ -1,0 +1,26 @@
+#!/bin/sh
+
+S6_DIR="${XDG_RUNTIME_DIR}/s6"
+s6_compdir="${HOME}/.config/s6-rc/rc/compiled"
+s6_scandir="${S6_DIR}/service"
+s6_livedir="${S6_DIR}/s6-rc"
+s6_logger_fifo="${S6_DIR}/s6-svscan-log/fifo"
+
+mkdir -p "${s6_scandir}"
+mkdir -p "${S6_DIR}/log"
+cp -rL "${HOME}/.config/s6-rc/s6-svscan-log" "${S6_DIR}/"
+mkfifo ${s6_logger_fifo}
+
+setsid -f \
+  redirfd -wnb 1 "${s6_logger_fifo}" \
+  fdmove -c 2 1  \
+    s6-envdir ~/.config/s6u/envdir \
+    s6-svscan -d 4 "${s6_scandir}" 4>&1 | read -r
+
+s6-rc-init -c "$s6_compdir" -l "$s6_livedir" "$s6_scandir"
+s6-rc -l "${s6_livedir}" -u change default
+
+
+export XDG_CURRENT_DESKTOP=unity
+dbus-run-session sway
+s6-rc -l "${s6_livedir}" -ba down
