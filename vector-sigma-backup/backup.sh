@@ -6,6 +6,7 @@ eval $(ssh-agent)
 ssh-add ~/.ssh/id_ed25519-gh
 
 cd ~/ww
+git pull
 git add *
 git commit -m "autosync from vector-sigma @ $(date +%c)"
 git push
